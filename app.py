@@ -33,7 +33,7 @@ class ChatCallbackHandler(BaseCallbackHandler):
 
 
 with st.sidebar:
-    apiKey = st.text_input("OpenAI API 키를 입력하세요.")
+    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
 
     file = st.file_uploader(
         "파일을 업로드하세요.",
@@ -56,7 +56,7 @@ def embed_file(file):
     )
     loader = UnstructuredFileLoader(file_path)
     docs = loader.load_and_split(text_splitter=splitter)
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
     cached_embeddings = CacheBackedEmbeddings.from_bytes_store(embeddings, cache_dir)
     vectorstore = FAISS.from_documents(docs, cached_embeddings)
     retriever = vectorstore.as_retriever()
@@ -116,7 +116,7 @@ def invoke_chain(message):
         callbacks=[
             ChatCallbackHandler(),
         ],
-        api_key=apiKey,
+        api_key=openai_api_key,
     )
 
     chain = (
@@ -149,7 +149,7 @@ Welcome!
 """
 )
 
-if apiKey and file:
+if openai_api_key and file:
     retriever = embed_file(file)
     send_message("질문받을 준비가 되었습니다!", "ai", save=False)
     paint_history()
