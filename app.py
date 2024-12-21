@@ -1,3 +1,4 @@
+import streamlit as st
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.document_loaders import UnstructuredFileLoader
 from langchain.embeddings import CacheBackedEmbeddings, OpenAIEmbeddings
@@ -9,7 +10,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.memory import ConversationBufferMemory
-import streamlit as st
+from pathlib import Path
 
 st.set_page_config(
     page_title="DocumentGPT",
@@ -39,20 +40,12 @@ with st.sidebar:
         type=["pdf", "txt", "docx"],
     )
 
-llm = ChatOpenAI(
-    temperature=0.1,
-    streaming=True,
-    callbacks=[
-        ChatCallbackHandler(),
-    ],
-    api_key=apiKey,
-)
-
 
 @st.cache_data(show_spinner="Embedding file...")
 def embed_file(file):
     file_content = file.read()
     file_path = f"./.cache/files/{file.name}"
+    Path("./.cache/files").mkdir(parents=True, exist_ok=True)
     with open(file_path, "wb") as f:
         f.write(file_content)
     cache_dir = LocalFileStore(f"./.cache/embeddings/{file.name}")
@@ -117,6 +110,15 @@ prompt = ChatPromptTemplate.from_messages(
 
 
 def invoke_chain(message):
+    llm = ChatOpenAI(
+        temperature=0.1,
+        streaming=True,
+        callbacks=[
+            ChatCallbackHandler(),
+        ],
+        api_key=apiKey,
+    )
+
     chain = (
         {
             "context": retriever | RunnableLambda(format_docs),
