@@ -223,9 +223,6 @@ else:
                 elif value is not None:
                     wrong += 1
 
-            st.write(f"정답: {correct}")
-            st.write(f"오답: {wrong}")
-
             question_length = len(response["questions"])
             if correct + wrong == question_length:
                 if correct == question_length:
