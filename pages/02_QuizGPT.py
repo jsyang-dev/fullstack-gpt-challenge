@@ -192,8 +192,8 @@ else:
     else:
         response = run_quiz_chain(docs, topic)
 
-    with st.sidebar:
-        grade_button = st.button("채점하기", key="grade_button")
+    correct = 0
+    wrong = 0
 
     with st.form("questions_form"):
         for idx, question in enumerate(response["questions"]):
@@ -205,24 +205,16 @@ else:
                 key=f"question_{idx}",
             )
 
-            if grade_button:
-                if {"answer": value, "correct": True} in question["answers"]:
-                    st.success("정답")
-                elif value is not None:
-                    st.error("오답")
+            if {"answer": value, "correct": True} in question["answers"]:
+                st.success("정답")
+                correct += 1
+            elif value is not None:
+                st.error("오답")
+                wrong += 1
         st.form_submit_button("제출하기")
 
     with st.sidebar:
-        if grade_button:
-            correct = 0
-            wrong = 0
-
-            for question in response["questions"]:
-                if {"answer": value, "correct": True} in question["answers"]:
-                    correct += 1
-                elif value is not None:
-                    wrong += 1
-
+        if st.form_submit_button:
             question_length = len(response["questions"])
             if correct + wrong == question_length:
                 if correct == question_length:
