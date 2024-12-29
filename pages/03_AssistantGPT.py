@@ -8,7 +8,6 @@ import json
 
 
 assistant_id = "asst_f7RNCt80DA1hNgEOHXv7FacN"
-# assistant_id = "asst_gLmlNp9EnQaeyt9ale3kpOlc"
 
 st.set_page_config(
     page_title="AssistantGPT",
@@ -16,6 +15,14 @@ st.set_page_config(
 )
 
 st.title("AssistantGPT")
+
+
+with st.sidebar:
+    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
+
+    if openai_api_key:
+        client.api_key = openai_api_key
+        st.success("OpenAI API 키가 입력되었습니다.")
 
 
 class EventHandler(AssistantEventHandler):
@@ -62,13 +69,15 @@ def insert_thread(message, role):
                     "role": role,
                     "content": message,
                 }
-            ]
+            ],
         )
         st.session_state["thread"] = thread
     else:
         thread = st.session_state["thread"]
         client.beta.threads.messages.create(
-            thread_id=thread.id, role=role, content=message
+            thread_id=thread.id,
+            role=role,
+            content=message,
         )
 
     with st.chat_message("assistant") as message_box:
@@ -232,10 +241,6 @@ functions = [
         },
     },
 ]
-
-
-with st.sidebar:
-    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
 
 if openai_api_key:
     send_message("어떤 정보를 알고 싶으신가요?", "assistant", save=False)
