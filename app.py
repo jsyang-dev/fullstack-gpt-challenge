@@ -10,6 +10,7 @@ st.markdown(
 # FullstackGPT 과제
             
 - [x] [DocumentGPT](/DocumentGPT)
-- [ ] [QuizGPT](/QuizGPT)
+- [x] [QuizGPT](/QuizGPT)
+- [x] [AssistantGPT](/AssistantGPT)
 """
 )
